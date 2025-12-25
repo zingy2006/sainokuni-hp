@@ -2,7 +2,7 @@
 @charset "UTF-8";
 
 :root {
-  --bg: #f0fdf4;
+  --bg: #dcfce7;
   --text: #0f172a;
   --muted: #475569;
   --accent: #2563eb;
@@ -56,10 +56,6 @@ body {
   padding: 1rem;
 }
 
-.left-column {
-  display: none;
-}
-
 .left-column,
 .right-column {
   background: #fff;
@@ -71,9 +67,6 @@ body {
 @media (min-width: 768px) {
   .layout {
     grid-template-columns: 3fr 7fr;
-  }
-  .left-column {
-    display: block;
   }
 }
 
