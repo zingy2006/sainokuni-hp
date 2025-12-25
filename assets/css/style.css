@@ -56,17 +56,33 @@ body {
   padding: 1rem;
 }
 
+/* モバイルでメインコンテンツを上に表示 */
+.right-column {
+  order: 1;
+}
+.left-column {
+  order: 2;
+}
+
 .left-column,
 .right-column {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 768px) {
   .layout {
     grid-template-columns: 3fr 7fr;
+  }
+  /* PCでは左カラムを左（先）に表示 */
+  .left-column {
+    order: 1;
+  }
+  .right-column {
+    order: 2;
   }
 }
 
