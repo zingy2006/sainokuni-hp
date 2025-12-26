@@ -53,10 +53,50 @@
   <aside class="left-column">
     <section class="widget calendar">
       <h2>カレンダー</h2>
-      <!-- Googleカレンダー（日本の祝日）埋め込み -->
-      <div class="calendar-wrapper">
-        <iframe src="https://calendar.google.com/calendar/embed?height=300&wkst=1&bgcolor=%23ffffff&ctz=Asia%2FTokyo&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&src=amEuamFwYW5lc2UjaG9saWRheUBncm91cC52LmNhbGVuZGFyLmdvb2dsZS5jb20&color=%230B8043" style="border-width:0" width="100%" height="300" frameborder="0" scrolling="no"></iframe>
-      </div>
+      <!-- JS動的カレンダー -->
+      <div id="js-calendar"></div>
+      <!-- 祝日判定ライブラリ -->
+      <script src="https://cdn.jsdelivr.net/npm/japanese-holidays@1.0.10/lib/japanese-holidays.min.js"></script>
+      <script>
+        (function() {
+          const container = document.getElementById('js-calendar');
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth(); // 0-indexed
+
+          // カレンダーヘッダー
+          let html = '<p style="text-align:center; font-weight:bold; margin:0 0 0.5rem;">' + year + '年' + (month + 1) + '月</p>';
+          html += '<table class="calendar-table"><thead><tr><th class="sunday">日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead><tbody><tr>';
+
+          const firstDay = new Date(year, month, 1);
+          const lastDay = new Date(year, month + 1, 0);
+          const startDay = firstDay.getDay();
+          
+          // 空白セル（月初の曜日まで）
+          for (let i = 0; i < startDay; i++) {
+            html += '<td></td>';
+          }
+
+          // 日付セル生成
+          for (let d = 1; d <= lastDay.getDate(); d++) {
+            const current = new Date(year, month, d);
+            const dayOfWeek = current.getDay();
+            const isHoliday = JapaneseHolidays.isHoliday(current);
+            
+            let classes = [];
+            if (dayOfWeek === 0) classes.push('sunday');
+            if (isHoliday) classes.push('holiday');
+            
+            // 行変え（日曜日かつ1日以外の場合）
+            if (dayOfWeek === 0 && d > 1) html += '</tr><tr>';
+            
+            html += '<td class="' + classes.join(' ') + '" title="' + (isHoliday || '') + '">' + d + '</td>';
+          }
+          
+          html += '</tr></tbody></table>';
+          container.innerHTML = html;
+        })();
+      </script>
     </section>
 
     <section class="widget blog-links">
