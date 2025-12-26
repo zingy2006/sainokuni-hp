@@ -60,41 +60,61 @@
       <script>
         (function() {
           const container = document.getElementById('js-calendar');
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = now.getMonth(); // 0-indexed
+          let showDate = new Date();
 
-          // カレンダーヘッダー
-          let html = '<p style="text-align:center; font-weight:bold; margin:0 0 0.5rem;">' + year + '年' + (month + 1) + '月</p>';
-          html += '<table class="calendar-table"><thead><tr><th class="sunday">日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead><tbody><tr>';
+          function render() {
+            const year = showDate.getFullYear();
+            const month = showDate.getMonth(); // 0-indexed
 
-          const firstDay = new Date(year, month, 1);
-          const lastDay = new Date(year, month + 1, 0);
-          const startDay = firstDay.getDay();
-          
-          // 空白セル（月初の曜日まで）
-          for (let i = 0; i < startDay; i++) {
-            html += '<td></td>';
+            // カレンダーヘッダー（ボタン付き）
+            let html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">';
+            html += '<button id="cal-prev" type="button" style="border:1px solid #ccc; background:#fff; border-radius:4px; cursor:pointer; padding:2px 8px;">&lt;</button>';
+            html += '<span style="font-weight:bold;">' + year + '年' + (month + 1) + '月</span>';
+            html += '<button id="cal-next" type="button" style="border:1px solid #ccc; background:#fff; border-radius:4px; cursor:pointer; padding:2px 8px;">&gt;</button>';
+            html += '</div>';
+            
+            html += '<table class="calendar-table"><thead><tr><th class="sunday">日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead><tbody><tr>';
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay();
+            
+            // 空白セル（月初の曜日まで）
+            for (let i = 0; i < startDay; i++) {
+              html += '<td></td>';
+            }
+
+            // 日付セル生成
+            for (let d = 1; d <= lastDay.getDate(); d++) {
+              const current = new Date(year, month, d);
+              const dayOfWeek = current.getDay();
+              const isHoliday = JapaneseHolidays.isHoliday(current);
+              
+              let classes = [];
+              if (dayOfWeek === 0) classes.push('sunday');
+              if (isHoliday) classes.push('holiday');
+              
+              // 行変え（日曜日かつ1日以外の場合）
+              if (dayOfWeek === 0 && d > 1) html += '</tr><tr>';
+              
+              html += '<td class="' + classes.join(' ') + '" title="' + (isHoliday || '') + '">' + d + '</td>';
+            }
+            
+            html += '</tr></tbody></table>';
+            container.innerHTML = html;
+
+            // ボタンイベント設定
+            document.getElementById('cal-prev').onclick = function() {
+              showDate.setMonth(showDate.getMonth() - 1);
+              render();
+            };
+            document.getElementById('cal-next').onclick = function() {
+              showDate.setMonth(showDate.getMonth() + 1);
+              render();
+            };
           }
 
-          // 日付セル生成
-          for (let d = 1; d <= lastDay.getDate(); d++) {
-            const current = new Date(year, month, d);
-            const dayOfWeek = current.getDay();
-            const isHoliday = JapaneseHolidays.isHoliday(current);
-            
-            let classes = [];
-            if (dayOfWeek === 0) classes.push('sunday');
-            if (isHoliday) classes.push('holiday');
-            
-            // 行変え（日曜日かつ1日以外の場合）
-            if (dayOfWeek === 0 && d > 1) html += '</tr><tr>';
-            
-            html += '<td class="' + classes.join(' ') + '" title="' + (isHoliday || '') + '">' + d + '</td>';
-          }
-          
-          html += '</tr></tbody></table>';
-          container.innerHTML = html;
+          render();
         })();
       </script>
     </section>
